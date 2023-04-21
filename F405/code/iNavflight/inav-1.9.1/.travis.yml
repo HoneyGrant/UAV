@@ -1,0 +1,54 @@
+env:
+# Specify the main Mafile supported goals.
+  - GOAL=test
+  - GOAL=targets-group-1
+  - GOAL=targets-group-2
+  - GOAL=targets-group-3
+  - GOAL=targets-group-4
+  - GOAL=targets-group-rest
+
+# use new docker environment
+sudo: false
+
+git:
+  depth: 5
+
+addons:
+  apt:
+    packages:
+      - build-essential
+      - git
+      - libc6-i386
+
+# We use cpp for unit tests, and c for the main project.
+language: cpp
+compiler: clang
+
+before_install:
+
+install:
+  - ./install-toolchain.sh
+  - export TOOLCHAINPATH=$PWD/gcc-arm-none-eabi-6-2017-q2-update/bin
+  - export PATH=$TOOLCHAINPATH:$PATH
+
+before_script:
+  - $TOOLCHAINPATH/arm-none-eabi-gcc --version
+  - clang --version
+  - clang++ --version
+
+script: ./.travis.sh
+
+cache: 
+  apt: true
+  directories:
+  - $PWD/gcc-arm-none-eabi-6-2017-q2-update
+
+notifications:
+  #slack: inavflight:UWRoWFJ4cbbpHXT8HJJlAPXa
+  email: false
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/34e795df229478ac3a3b
+    on_success: always
+    on_failure: always
+    on_start: never
